@@ -141,7 +141,10 @@ const ctx    = canvas.getContext('2d');
 // Background livello 1
 const bgImg = new Image();
 bgImg.src = 'bg_level1.png';
-const imgProf      = new Image(); imgProf.src      = 'prof.png';
+const imgHauntedHouse = new Image(); imgHauntedHouse.src = 'haunted_house.png';
+const imgGuru         = new Image(); imgGuru.src         = 'guru.png';
+const imgGuruAngry    = new Image(); imgGuruAngry.src    = 'guru_angry.png';
+const imgProf         = new Image(); imgProf.src         = 'prof.png';
 const imgDumpster  = new Image(); imgDumpster.src  = 'dumpster.png';
 const imgCarloRun  = new Image(); imgCarloRun.src  = 'carlo_run.png';
 const imgCarloIdle = new Image(); imgCarloIdle.src = 'carlo_idle.png';
@@ -1567,6 +1570,18 @@ function drawL2World(gy) {
 
 function drawL2House1(sx, gy) {
   const HW=220, HH=220;
+  // Usa sprite se disponibile
+  if (imgHauntedHouse.complete && imgHauntedHouse.naturalWidth > 0) {
+    ctx.drawImage(imgHauntedHouse, sx, gy-HH, HW, HH);
+    // Mantieni hint SCAPPA
+    if (l2.house1Entered && l2.snakeActive) {
+      if (Math.floor(Date.now()/400)%2===0) {
+        ctx.font='9px "Press Start 2P"'; ctx.fillStyle='#ff2222'; ctx.textAlign='center';
+        ctx.fillText('⚠ SCAPPA! ⚠', sx+110, gy-240); ctx.textAlign='left';
+      }
+    }
+    return;
+  }
   // Piano 1
   ctx.fillStyle='#6a5a4a'; ctx.fillRect(sx,gy-80,HW,80);
   // Piano 2
@@ -1899,31 +1914,28 @@ function drawL2Guru(gy) {
   // Guru vola in alto quando arrabbiato
   const guruFloatY = angry ? Math.floor(gy * 0.45) + Math.sin(t/400)*12 : gy;
   const gy2 = guruFloatY;
-  ctx.save(); ctx.translate(Math.round(gx), Math.round(gy2)); ctx.scale(scale,scale);
-  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
-  // Veste
-  p(-18,-80+bob,36,60,'#f5f5f5'); p(-22,-60+bob,44,40,'#f0f0f0');
-  // Barba
-  p(-10,-50+bob,20,50,'#fff'); p(-8,-30+bob,16,48,'#f0f0f0');
-  p(-6,-10+bob,12,28,'#fff'); p(-4,8+bob,8,18,'#f5f5f5');
-  // Testa
-  p(-14,-120+bob,28,32,'#fde8c8');
-  // Capelli bianchi
-  p(-16,-122+bob,32,10,'#fff'); p(-18,-120+bob,6,20,'#fff'); p(12,-120+bob,6,20,'#fff');
-  // Occhi
-  if (!angry) {
-    p(-8,-112+bob,6,6,'#2a1a0e'); p(2,-112+bob,6,6,'#2a1a0e');
-    p(-7,-111+bob,3,3,'#fff'); p(3,-111+bob,3,3,'#fff');
-    p(-6,-102+bob,12,3,'#c08060'); p(-4,-99+bob,8,3,'#c08060');
+  const guruImg = angry ? imgGuruAngry : imgGuru;
+  const gw = Math.round(80 * scale), gh = Math.round(140 * scale);
+  if (guruImg.complete && guruImg.naturalWidth > 0) {
+    ctx.save();
+    ctx.translate(Math.round(gx - gw/2), Math.round(gy2 - gh + bob));
+    ctx.drawImage(guruImg, 0, 0, gw, gh);
+    ctx.restore();
   } else {
-    p(-10,-114+bob,8,8,'#ff2200'); p(2,-114+bob,8,8,'#ff2200');
-    const rl=28+Math.sin(t/80)*8;
-    ctx.fillStyle='rgba(255,200,0,0.85)'; ctx.fillRect(-10,-114+bob,rl,4); ctx.fillRect(10,-114+bob,-rl,4);
-    p(-10,-100+bob,20,8,'#aa0000'); p(-7,-98+bob,14,6,'#ffaaaa');
-    if (Math.floor(t/150)%2===0){ctx.strokeStyle='#ff4400';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-70+bob,52,0,Math.PI*2);ctx.stroke();}
-    p(-35,-85+bob,20,10,'#f5f5f5'); p(15,-85+bob,20,10,'#f5f5f5');
+    ctx.save(); ctx.translate(Math.round(gx), Math.round(gy2)); ctx.scale(scale,scale);
+    const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+    p(-18,-80+bob,36,60,'#f5f5f5'); p(-22,-60+bob,44,40,'#f0f0f0');
+    p(-10,-50+bob,20,50,'#fff');
+    p(-14,-120+bob,28,32,'#fde8c8');
+    p(-16,-122+bob,32,10,'#fff');
+    if (!angry) {
+      p(-8,-112+bob,6,6,'#2a1a0e'); p(2,-112+bob,6,6,'#2a1a0e');
+    } else {
+      p(-10,-114+bob,8,8,'#ff2200'); p(2,-114+bob,8,8,'#ff2200');
+      if (Math.floor(t/150)%2===0){ctx.strokeStyle='#ff4400';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-70+bob,52,0,Math.PI*2);ctx.stroke();}
+    }
+    ctx.restore();
   }
-  ctx.restore();
   // Label/dialog
   if (!angry) {
     const dialogs=[
