@@ -1477,7 +1477,19 @@ function drawL2() {
 }
 
 function drawL2World(gy) {
-  // Cielo
+  // Sfondo livello 2 scorrevole
+  if (imgBgLevel2.complete && imgBgLevel2.naturalWidth > 0) {
+    const bw = imgBgLevel2.naturalWidth;
+    const bh = imgBgLevel2.naturalHeight;
+    const scale = H / bh;
+    const bDrawW = Math.round(bw * scale);
+    const parallax = Math.round(camera * 0.4) % bDrawW;
+    for (let bx = -parallax; bx < W + bDrawW; bx += bDrawW) {
+      ctx.drawImage(imgBgLevel2, Math.round(bx), 0, bDrawW, H);
+    }
+    return; // non disegna cielo/sole/nuvole JS
+  }
+  // Fallback cielo
   const grad = ctx.createLinearGradient(0,0,0,gy);
   grad.addColorStop(0,'#87ceeb'); grad.addColorStop(1,'#c8e8f8');
   ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
