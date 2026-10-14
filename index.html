@@ -152,7 +152,7 @@ const imgIliaRun   = new Image(); imgIliaRun.src   = 'ilia_run.png';
 const imgIliaTop   = new Image(); imgIliaTop.src   = 'ilia_top_down.png';
 
 function drawSprite(img, x, y, w, h, flipX) {
-  if (!img.complete || img.naturalWidth === 0) return false;
+  if (!img || !img.complete || img.naturalWidth === 0) return false;
   ctx.save();
   if (flipX) {
     ctx.translate(Math.round(x + w), Math.round(y));
@@ -164,7 +164,6 @@ function drawSprite(img, x, y, w, h, flipX) {
   ctx.restore();
   return true;
 }
-
 
 // W/H are plain variables, updated on resize
 let W = window.innerWidth;
