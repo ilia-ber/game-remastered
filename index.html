@@ -1479,11 +1479,10 @@ function drawL2() {
 function drawL2World(gy) {
   // Sfondo livello 2 scorrevole
   if (imgBgLevel2.complete && imgBgLevel2.naturalWidth > 0) {
-    const bw = imgBgLevel2.naturalWidth;
     const bh = imgBgLevel2.naturalHeight;
-    const scale = gy / bh; // scala fino al terreno, non all'intera H
-    const bDrawW = Math.round(bw * scale);
-    const parallax = Math.round(camera * 0.4) % bDrawW;
+    const scale = gy / bh;
+    const bDrawW = Math.round(imgBgLevel2.naturalWidth * scale);
+    const parallax = Math.round(camera * 0.15) % bDrawW; // molto lento
     for (let bx = -parallax; bx < W + bDrawW; bx += bDrawW) {
       ctx.drawImage(imgBgLevel2, Math.round(bx), 0, bDrawW, gy);
     }
