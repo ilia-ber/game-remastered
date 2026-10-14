@@ -1481,20 +1481,21 @@ function drawL2World(gy) {
   if (imgBgLevel2.complete && imgBgLevel2.naturalWidth > 0) {
     const bw = imgBgLevel2.naturalWidth;
     const bh = imgBgLevel2.naturalHeight;
-    const scale = H / bh;
+    const scale = gy / bh; // scala fino al terreno, non all'intera H
     const bDrawW = Math.round(bw * scale);
     const parallax = Math.round(camera * 0.4) % bDrawW;
     for (let bx = -parallax; bx < W + bDrawW; bx += bDrawW) {
-      ctx.drawImage(imgBgLevel2, Math.round(bx), 0, bDrawW, H);
+      ctx.drawImage(imgBgLevel2, Math.round(bx), 0, bDrawW, gy);
     }
-    return; // non disegna cielo/sole/nuvole JS
+  } else {
+    // Fallback cielo
+    const grad = ctx.createLinearGradient(0,0,0,gy);
+    grad.addColorStop(0,'#87ceeb'); grad.addColorStop(1,'#c8e8f8');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,W,gy);
   }
-  // Fallback cielo
-  const grad = ctx.createLinearGradient(0,0,0,gy);
-  grad.addColorStop(0,'#87ceeb'); grad.addColorStop(1,'#c8e8f8');
-  ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
 
-  // Sole
+  // Sole, nuvole, uccelli solo senza immagine
+  if (imgBgLevel2.complete && imgBgLevel2.naturalWidth > 0) { /* skip JS sky */ } else {
   ctx.fillStyle = '#ffe566';
   ctx.beginPath(); ctx.arc(W*0.15, 60, 26, 0, Math.PI*2); ctx.fill();
 
@@ -1521,6 +1522,7 @@ function drawL2World(gy) {
     ctx.moveTo(sx,by); ctx.quadraticCurveTo(sx+8,by-wing,sx+16,by);
     ctx.stroke();
   });
+  } // fine blocco sky JS
 
   // Casa 3 (bianca e luminosa)
   if (l2.house3X > 0) {
