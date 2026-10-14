@@ -1726,9 +1726,8 @@ function drawL2Snake(gy) {
 }
 
 function drawL2TempleExterior(sx, gy) {
-  const TW = l2.templeW, TH = 300;
   if (imgTempio.complete && imgTempio.naturalWidth > 0) {
-    ctx.drawImage(imgTempio, sx, gy-TH, TW, TH);
+    ctx.drawImage(imgTempio, sx, gy-300, l2.templeW, 300);
     return;
   }
   const TW = l2.templeW;
