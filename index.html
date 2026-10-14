@@ -143,6 +143,7 @@ const bgImg = new Image();
 bgImg.src = 'bg_level1.png';
 const imgHauntedHouse = new Image(); imgHauntedHouse.src = 'haunted_house.png';
 const imgBgDungeon    = new Image(); imgBgDungeon.src    = 'bg_dungeon.png';
+const imgBgLevel2     = new Image(); imgBgLevel2.src     = 'bg_level2.png';
 const imgTempio       = new Image(); imgTempio.src       = 'tempio.png';
 const imgGuru         = new Image(); imgGuru.src         = 'guru.png';
 const imgGuruAngry    = new Image(); imgGuruAngry.src    = 'guru_angry.png';
@@ -1727,7 +1728,8 @@ function drawL2Snake(gy) {
 
 function drawL2TempleExterior(sx, gy) {
   if (imgTempio.complete && imgTempio.naturalWidth > 0) {
-    ctx.drawImage(imgTempio, sx, gy-300, l2.templeW, 300);
+    const tH = 420;
+    ctx.drawImage(imgTempio, sx - 40, gy - tH, l2.templeW + 80, tH);
     return;
   }
   const TW = l2.templeW;
@@ -1812,10 +1814,7 @@ function drawL2Temple(gy) {
     grad.addColorStop(0,'#1a0e08'); grad.addColorStop(1,'#0e0a06');
     ctx.fillStyle=grad; ctx.fillRect(0,0,W,gy);
   }
-  // Stanza interna del tempio
-  const grad=ctx.createLinearGradient(0,0,0,gy);
-  grad.addColorStop(0,'#1e1a14'); grad.addColorStop(0.6,'#2a2418'); grad.addColorStop(1,'#181208');
-  ctx.fillStyle=grad; ctx.fillRect(0,0,W,gy);
+  // Sfondo tempio gestito da bg_dungeon sopra (fallback già incluso)
   // Pavimento con tile scorrevoli
   const tileOff = angry ? Math.round(camera % 44) : 0;
   ctx.fillStyle='#4a4030'; ctx.fillRect(0,gy,W,8);
