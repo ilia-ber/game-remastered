@@ -142,28 +142,6 @@ const ctx    = canvas.getContext('2d');
 const bgImg = new Image();
 bgImg.src = 'bg_level1.png';
 
-// Sprites personaggi
-const imgCarloRun   = new Image(); imgCarloRun.src   = 'carlo_run.png';
-const imgCarloIdle  = new Image(); imgCarloIdle.src  = 'carlo_idle.png';
-const imgCarloTop   = new Image(); imgCarloTop.src   = 'carlo_top_down.png';
-const imgIliaPink   = new Image(); imgIliaPink.src   = 'ilia_pink.png';
-const imgIliaBrown  = new Image(); imgIliaBrown.src  = 'ilia_brown.png';
-const imgIliaTop    = new Image(); imgIliaTop.src    = 'ilia_top_down.png';
-const imgIliaRun    = new Image(); imgIliaRun.src    = 'ilia_run.png';
-
-function drawSprite(img, x, y, w, h, flipX) {
-  if (!img.complete || img.naturalWidth === 0) return false;
-  ctx.save();
-  if (flipX) {
-    ctx.translate(Math.round(x + w), Math.round(y));
-    ctx.scale(-1, 1);
-    ctx.drawImage(img, 0, 0, w, h);
-  } else {
-    ctx.drawImage(img, Math.round(x), Math.round(y), w, h);
-  }
-  ctx.restore();
-  return true;
-}
 
 // W/H are plain variables, updated on resize
 let W = window.innerWidth;
@@ -382,48 +360,62 @@ function drawBackground() {
 
 function drawCarlo() {
   const sx = Math.round(sc(player.x));
-  const sy = Math.round(player.y - player.h);
-  const w = (player.w + 8) * 2;
-  const h = (player.h + 4) * 2;
-  const moving = Math.abs(player.vx) > 0.5;
-  const img = moving ? imgCarloRun : imgCarloIdle;
-  const flip = player.facing < 0;
-  if (!drawSprite(img, sx - w/2 + player.w/2, Math.round(player.y) - h, w, h, flip)) {
-    // fallback blocchetti
-    const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
-    ctx.save(); ctx.translate(sx, Math.round(player.y));
-    p(1,-5,8,5,'#111'); p(11,-5,8,5,'#111');
-    p(2,-18,14,13,'#2d5a27'); p(3,-30,13,13,'#9b1515');
-    p(5,-42,8,14,'#fcd5a0'); p(3,-50,14,10,'#c8920a');
-    ctx.restore();
-  }
+  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+  ctx.save(); ctx.translate(sx, Math.round(player.y));
+  if (player.facing < 0) { ctx.scale(-1,1); ctx.translate(-player.w,0); }
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(2,0,18,3);
+  // Scarpe
+  p(1,-5,8,5,'#1a1a1a'); p(11,-5,8,5,'#1a1a1a');
+  p(0,-4,9,4,'#2d5a27'); p(11,-4,9,4,'#2d5a27');
+  // Pantaloni
+  p(2,-18,8,13,'#1e3a1e'); p(12,-18,8,13,'#1e3a1e');
+  // Maglietta
+  p(1,-30,20,13,'#9b1515');
+  // Braccia
+  p(-3,-29,4,11,'#9b1515'); p(-3,-19,4,4,'#fcd5a0');
+  p(20,-29,4,11,'#9b1515'); p(20,-19,4,4,'#fcd5a0');
+  // Collo
+  p(7,-34,7,5,'#fcd5a0');
+  // Testa
+  p(3,-44,16,12,'#fcd5a0');
+  // Capelli
+  p(2,-50,18,8,'#c8920a');
+  p(0,-48,4,6,'#c8920a'); p(18,-48,4,6,'#c8920a');
+  // Bandana
+  p(3,-46,16,4,'#cc2222');
+  // Occhi
+  p(6,-41,4,4,'#5bc8f0'); p(13,-41,4,4,'#5bc8f0');
+  p(6,-41,2,2,'#fff'); p(13,-41,2,2,'#fff');
+  p(7,-40,2,2,'#1a5a8a'); p(14,-40,2,2,'#1a5a8a');
+  // Naso/bocca
+  p(10,-37,2,2,'#e8a090');
+  p(8,-34,6,2,'#cc7060');
+  ctx.restore();
 }
 
 function drawIliaHair(brown) {
   const sx = Math.round(sc(ilia.x));
-  const sy = Math.round(ilia.y - ilia.h - 4);
-  const w = 56;
-  const h = 104;
-  let img;
-  if (brown && (level >= 2 || state === 'cutscene')) {
-    const iliaMoving = level >= 2 && Math.abs(ilia.x - (player.x - 55)) > 3;
-    img = iliaMoving ? imgIliaRun : imgIliaBrown;
-  } else {
-    img = imgIliaPink;
-  }
-  // Nel livello 1 fine (Ilia ferma), guardare verso Carlo (flip=true = guarda sx)
-  const iliaFlip = (level === 1 && Math.abs(ilia.vx || 0) < 0.1);
-  if (!drawSprite(img, sx - 12, Math.round(ilia.y) - h, w, h, iliaFlip)) {
-    // fallback
-    const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
-    const hair = brown ? '#8b5a2b' : '#f070b0';
-    ctx.save(); ctx.translate(sx, Math.round(ilia.y));
-    p(-1,-34,3,28,hair); p(19,-34,3,28,hair);
-    p(1,-46,20,5,hair); p(-1,-44,24,5,hair);
-    p(1,-30,20,13,'#1a1a1a'); p(3,-44,16,2,'#555');
-    p(6,-41,5,5,'#1a1a1a'); p(13,-41,5,5,'#1a1a1a');
-    ctx.restore();
-  }
+  const p=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);};
+  const hair  = brown ? '#8b5a2b' : C.iHair;
+  const hairH = brown ? '#c08840' : '#f8a0c8';
+  const wv = Math.floor(Date.now()/500)%2===0 ? -2 : 0;
+  ctx.save(); ctx.translate(sx, Math.round(ilia.y));
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(2,0,18,3);
+  p(1,-5,8,5,'#111'); p(11,-5,8,5,'#111');
+  p(2,-18,8,13,C.iPants); p(12,-18,8,13,C.iPants);
+  p(1,-30,20,13,C.iShirt);
+  p(-3,-29,4,11,C.iShirt); p(-3,-19,4,4,C.skin);
+  p(20,-29+wv,4,11,C.iShirt); p(20,-19+wv,4,4,C.skin);
+  p(7,-34,7,5,C.skin);
+  p(3,-44,16,12,C.skin); p(3,-33,16,2,C.skinS);
+  p(-1,-34,3,28,hair); p(19,-34,3,28,hair);
+  p(1,-46,20,5,hair); p(-1,-44,24,5,hair);
+  p(2,-46,4,10,hairH);
+  p(6,-41,5,5,C.iEyes); p(13,-41,5,5,C.iEyes);
+  p(6,-41,2,2,'#fff'); p(13,-41,2,2,'#fff');
+  p(5,-42,6,2,'#111'); p(12,-42,6,2,'#111');
+  p(8,-35,7,2,'#c05848');
+  ctx.restore();
 }
 
 function drawIlia() {
@@ -471,31 +463,21 @@ function drawObstacle(ob) {
 
     // hitbox debug: r(0,0,ob.w,ob.h,'rgba(255,0,0,0.2)');
 
-    // CORPO professore
-    p(6, 2+walk, 24,4,'#5a3a10');   // tocco mortarboard
-    p(2,-2+walk, 32,6,'#5a3a10');   // tesa mortarboard
-    p(8, 6+walk, 20,18,'#1a3a7a');  // giacca
-    p(2, 8+walk,  6,14,'#1a3a7a');  // braccio sx
-    p(4, 6+walk, 28,6,'#fcd5a0');   // colletto/faccia
-    p(8, 2+walk, 20,8,'#fcd5a0');   // faccia
-    // occhi arrabbiati
-    p(10,4+walk,5,4,'#cc2200'); p(19,4+walk,5,4,'#cc2200');
-    p(10,3+walk,6,2,'#333');    p(19,3+walk,6,2,'#333'); // sopracciglia
-    // bocca urla
-    p(12,9+walk,8,3,'#cc2200');
-    // gambe che camminano
-    const legL = Math.sin(t/200)*6;
-    p(8, 24+walk, 8,14+legL,'#0a1a4a');
-    p(18,24+walk, 8,14-legL,'#0a1a4a');
-
-    // BRACCIO DX che lancia - animato
-    const throwAngle = Math.sin(t/350);
-    const armX = 28 + throwAngle*8;
-    const armY = 8 + walk - throwAngle*6;
-    p(armX, armY, 6,12,'#1a3a7a');  // braccio
-    p(armX+1, armY+12, 5,4,'#fcd5a0'); // mano
-
-    // LIBRI LANCIATI (volano verso sinistra)
+    // PROFESSORE — sprite o fallback JS
+    if (imgProf.complete && imgProf.naturalWidth > 0) {
+      ctx.drawImage(imgProf, 0, -ob.h, ob.w, ob.h);
+    } else {
+      p(6, 2+walk, 24,4,'#5a3a10');
+      p(2,-2+walk, 32,6,'#5a3a10');
+      p(8, 6+walk, 20,18,'#1a3a7a');
+      p(8, 2+walk, 20,8,'#fcd5a0');
+      p(10,4+walk,5,4,'#cc2200'); p(19,4+walk,5,4,'#cc2200');
+      const legL = Math.sin(t/200)*6;
+      p(8, 24+walk, 8,14+legL,'#0a1a4a'); p(18,24+walk, 8,14-legL,'#0a1a4a');
+      ctx.font='9px "Press Start 2P"'; ctx.fillStyle='#ff4444';
+      ctx.fillText('PROF!', -2,-22+walk);
+    }
+    // Libri lanciati (sempre visibili)
     const bookPhase = (t/800) % 1;
     const bookPhase2 = ((t/800)+0.5) % 1;
     const drawBook = (phase) => {
@@ -508,25 +490,26 @@ function drawObstacle(ob) {
     drawBook(bookPhase);
     drawBook(bookPhase2);
 
-    ctx.font='9px "Press Start 2P"'; ctx.fillStyle='#ff4444';
-    ctx.fillText('PROF!', -2,-22+walk);
-
   } else if (ob.type==='pattumiera') {
     // ── SACCHETTO ROTOLANTE ──
     const roll = (t/180) % (Math.PI*2);
-    ctx.save();
-    ctx.translate(18, 28);
-    ctx.rotate(roll * 0.4);
-    ctx.translate(-18,-28);
-    p(4,4,28,32,'#2a4a2a');
-    p(0,22,8,14,'#2a4a2a');
-    p(14,0,8,6,'#1a3a1a');
-    p(6,8,6,6,'#3a6a3a'); p(22,12,5,5,'#3a6a3a');
-    // X occhi minacciosi
-    p(8,12,4,4,'#88ff44'); p(20,12,4,4,'#88ff44');
-    ctx.restore();
-    ctx.font='9px "Press Start 2P"'; ctx.fillStyle='#88ff44';
-    ctx.fillText('SPAZ!',-4,-14);
+    if (imgDumpster.complete && imgDumpster.naturalWidth > 0) {
+      ctx.save();
+      ctx.translate(ob.w/2, ob.h/2);
+      ctx.rotate(roll * 0.4);
+      ctx.translate(-ob.w/2, -ob.h/2);
+      ctx.drawImage(imgDumpster, 0, 0, ob.w, ob.h);
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.translate(18, 28); ctx.rotate(roll * 0.4); ctx.translate(-18,-28);
+      p(4,4,28,32,'#2a4a2a'); p(0,22,8,14,'#2a4a2a');
+      p(14,0,8,6,'#1a3a1a');
+      p(8,12,4,4,'#88ff44'); p(20,12,4,4,'#88ff44');
+      ctx.restore();
+      ctx.font='9px "Press Start 2P"'; ctx.fillStyle='#88ff44';
+      ctx.fillText('SPAZ!',-4,-14);
+    }
 
   } else if (ob.type==='concerto') {
     // ── PALCO ANNI 80 nello sfondo ──
@@ -2284,23 +2267,25 @@ function drawLevel3() {
   // ── CARLO top-down ──
   const cs=sc2;
   const carlox=rx+l3.px*sc2, carloy=ry+l3.py*sc2;
-  const ctw=Math.round(24*cs), cth=Math.round(30*cs);
-  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(carlox+ctw/2,carloy+cth+2,ctw/2,3,0,0,Math.PI*2); ctx.fill();
-  if (!drawSprite(imgCarloTop, carlox, carloy, ctw, cth, false)) {
-    ctx.fillStyle='#9b1515'; ctx.fillRect(carlox+2*cs,carloy+8*cs,14*cs,8*cs);
-    ctx.fillStyle='#fcd5a0'; ctx.beginPath(); ctx.arc(carlox+9*cs,carloy+6*cs,7*cs,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#c8920a'; ctx.fillRect(carlox+2*cs,carloy+1*cs,14*cs,5*cs);
-  }
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(carlox+9*cs,carloy+21*cs,9*cs,3*cs,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#1e1e1e'; ctx.fillRect(carlox+3*cs,carloy+14*cs,5*cs,7*cs); ctx.fillRect(carlox+10*cs,carloy+14*cs,5*cs,7*cs);
+  ctx.fillStyle='#2d5a27'; ctx.fillRect(carlox+2*cs,carloy+20*cs,6*cs,3*cs); ctx.fillRect(carlox+10*cs,carloy+20*cs,6*cs,3*cs);
+  ctx.fillStyle='#9b1515'; ctx.fillRect(carlox+2*cs,carloy+8*cs,14*cs,8*cs);
+  ctx.fillStyle='#fcd5a0'; ctx.beginPath(); ctx.arc(carlox+9*cs,carloy+6*cs,7*cs,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#c8920a'; ctx.beginPath(); ctx.arc(carlox+9*cs,carloy+3*cs,7*cs,Math.PI,0); ctx.fill();
+  ctx.fillRect(carlox+2*cs,carloy+1*cs,14*cs,5*cs);
+  ctx.fillStyle='#5bc8f0'; ctx.fillRect(carlox+5*cs,carloy+6*cs,3*cs,3*cs); ctx.fillRect(carlox+11*cs,carloy+6*cs,3*cs,3*cs);
 
   // ── ILIA top-down ──
   const iliax=carlox-18*cs, iliay=carloy+2*cs;
-  const itw=Math.round(20*cs), ith=Math.round(26*cs);
-  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(iliax+itw/2,iliay+ith+2,itw/2,3,0,0,Math.PI*2); ctx.fill();
-  if (!drawSprite(imgIliaTop, iliax, iliay, itw, ith, false)) {
-    ctx.fillStyle='#1a1a1a'; ctx.fillRect(iliax+1*cs,iliay+7*cs,12*cs,8*cs);
-    ctx.fillStyle='#fcd5a0'; ctx.beginPath(); ctx.arc(iliax+7*cs,iliay+6*cs,6*cs,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#8b5a2b'; ctx.fillRect(iliax+1*cs,iliay+1*cs,12*cs,5*cs);
-  }
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(iliax+7*cs,iliay+18*cs,7*cs,3*cs,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#141414'; ctx.fillRect(iliax+2*cs,iliay+13*cs,4*cs,6*cs); ctx.fillRect(iliax+8*cs,iliay+13*cs,4*cs,6*cs);
+  ctx.fillStyle='#1a1a1a'; ctx.fillRect(iliax+1*cs,iliay+7*cs,12*cs,8*cs);
+  ctx.fillStyle='#fcd5a0'; ctx.beginPath(); ctx.arc(iliax+7*cs,iliay+6*cs,6*cs,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#8b5a2b'; ctx.beginPath(); ctx.arc(iliax+7*cs,iliay+3*cs,6*cs,Math.PI,0); ctx.fill();
+  ctx.fillRect(iliax+1*cs,iliay+1*cs,12*cs,5*cs);
+  ctx.fillRect(iliax-1*cs,iliay+5*cs,3*cs,12*cs); ctx.fillRect(iliax+12*cs,iliay+5*cs,3*cs,12*cs);
+  ctx.fillStyle='#2a1a0e'; ctx.fillRect(iliax+4*cs,iliay+6*cs,2*cs,2*cs); ctx.fillRect(iliax+9*cs,iliay+6*cs,2*cs,2*cs);
 
   // ── DIALOG ILIA ──
   if (l3.iliaDialogTimer > 0) {
