@@ -142,6 +142,8 @@ const ctx    = canvas.getContext('2d');
 const bgImg = new Image();
 bgImg.src = 'bg_level1.png';
 const imgHauntedHouse = new Image(); imgHauntedHouse.src = 'haunted_house.png';
+const imgBgDungeon    = new Image(); imgBgDungeon.src    = 'bg_dungeon.png';
+const imgTempio       = new Image(); imgTempio.src       = 'tempio.png';
 const imgGuru         = new Image(); imgGuru.src         = 'guru.png';
 const imgGuruAngry    = new Image(); imgGuruAngry.src    = 'guru_angry.png';
 const imgProf         = new Image(); imgProf.src         = 'prof.png';
@@ -1572,7 +1574,7 @@ function drawL2House1(sx, gy) {
   const HW=220, HH=220;
   // Usa sprite se disponibile
   if (imgHauntedHouse.complete && imgHauntedHouse.naturalWidth > 0) {
-    ctx.drawImage(imgHauntedHouse, sx, gy-HH, HW, HH);
+    ctx.drawImage(imgHauntedHouse, sx, gy-HH*2, HW*2, HH*2);
     // Mantieni hint SCAPPA
     if (l2.house1Entered && l2.snakeActive) {
       if (Math.floor(Date.now()/400)%2===0) {
@@ -1724,6 +1726,11 @@ function drawL2Snake(gy) {
 }
 
 function drawL2TempleExterior(sx, gy) {
+  const TW = l2.templeW, TH = 300;
+  if (imgTempio.complete && imgTempio.naturalWidth > 0) {
+    ctx.drawImage(imgTempio, sx, gy-TH, TW, TH);
+    return;
+  }
   const TW = l2.templeW;
   // Alberi dietro
   [sx-40, sx+TW*0.25, sx+TW*0.75, sx+TW+30].forEach(tx=>{
@@ -1790,6 +1797,22 @@ function drawL2TempleExterior(sx, gy) {
 
 function drawL2Temple(gy) {
   const angry = l2.guruState==='angry' || l2.battleDone;
+  // Sfondo dungeon scorrevole
+  if (imgBgDungeon.complete && imgBgDungeon.naturalWidth > 0) {
+    const bw = imgBgDungeon.naturalWidth;
+    const bh = imgBgDungeon.naturalHeight;
+    const bScale = gy / bh;
+    const bDrawW = Math.round(bw * bScale);
+    const offset = Math.round(l2.battleTimer * 1.5) % bDrawW;
+    for (let bx = -offset; bx < W + bDrawW; bx += bDrawW) {
+      ctx.drawImage(imgBgDungeon, Math.round(bx), 0, bDrawW, gy);
+    }
+  } else {
+    // fallback sfondo scuro
+    const grad=ctx.createLinearGradient(0,0,0,gy);
+    grad.addColorStop(0,'#1a0e08'); grad.addColorStop(1,'#0e0a06');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,gy);
+  }
   // Stanza interna del tempio
   const grad=ctx.createLinearGradient(0,0,0,gy);
   grad.addColorStop(0,'#1e1a14'); grad.addColorStop(0.6,'#2a2418'); grad.addColorStop(1,'#181208');
