@@ -141,8 +141,29 @@ const ctx    = canvas.getContext('2d');
 // Background livello 1
 const bgImg = new Image();
 bgImg.src = 'bg_level1.png';
-const imgProf = new Image(); imgProf.src = 'prof.png';
-const imgDumpster = new Image(); imgDumpster.src = 'dumpster.png';
+const imgProf      = new Image(); imgProf.src      = 'prof.png';
+const imgDumpster  = new Image(); imgDumpster.src  = 'dumpster.png';
+const imgCarloRun  = new Image(); imgCarloRun.src  = 'carlo_run.png';
+const imgCarloIdle = new Image(); imgCarloIdle.src = 'carlo_idle.png';
+const imgCarloTop  = new Image(); imgCarloTop.src  = 'carlo_top_down.png';
+const imgIliaPink  = new Image(); imgIliaPink.src  = 'ilia_pink.png';
+const imgIliaBrown = new Image(); imgIliaBrown.src = 'ilia_brown.png';
+const imgIliaRun   = new Image(); imgIliaRun.src   = 'ilia_run.png';
+const imgIliaTop   = new Image(); imgIliaTop.src   = 'ilia_top_down.png';
+
+function drawSprite(img, x, y, w, h, flipX) {
+  if (!img.complete || img.naturalWidth === 0) return false;
+  ctx.save();
+  if (flipX) {
+    ctx.translate(Math.round(x + w), Math.round(y));
+    ctx.scale(-1, 1);
+    ctx.drawImage(img, 0, 0, w, h);
+  } else {
+    ctx.drawImage(img, Math.round(x), Math.round(y), w, h);
+  }
+  ctx.restore();
+  return true;
+}
 
 
 // W/H are plain variables, updated on resize
