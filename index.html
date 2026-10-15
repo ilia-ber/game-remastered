@@ -631,10 +631,14 @@ function drawCallEffect() {
   r(cx-65,cy-90,130,110,'#001a33');
   ctx.strokeStyle='#60c0ff'; ctx.lineWidth=3;
   ctx.strokeRect(cx-65,cy-90,130,110);
-  r(cx-15,cy-80,30,8,C.iHair); r(cx-18,cy-74,36,6,C.iHair);
-  r(cx-14,cy-68,28,22,C.skin);
-  r(cx-8,cy-62,6,6,C.iEyes); r(cx+2,cy-62,6,6,C.iEyes);
-  r(cx-8,cy-62,2,2,'#fff'); r(cx+2,cy-62,2,2,'#fff');
+  // Avatar Ilia
+  if (imgIliaAvatar.complete && imgIliaAvatar.naturalWidth > 0) {
+    ctx.drawImage(imgIliaAvatar, cx-30, cy-88, 60, 70);
+  } else {
+    r(cx-15,cy-80,30,8,C.iHair); r(cx-18,cy-74,36,6,C.iHair);
+    r(cx-14,cy-68,28,22,C.skin);
+    r(cx-8,cy-62,6,6,C.iEyes); r(cx+2,cy-62,6,6,C.iEyes);
+  }
   ctx.fillStyle='#60c0ff'; ctx.font='6px "Press Start 2P"'; ctx.textAlign='center';
   ctx.fillText('ILIA ♥',cx,cy-14);
   ctx.fillText('+100 ENERGIA!',cx,cy+2);
@@ -1179,7 +1183,7 @@ function initLevel2() {
   // Update button
   const em = document.getElementById('powerupEmoji');
   const hl = document.getElementById('healLabel');
-  if (em) em.textContent = '💋';
+  if (em) em.innerHTML = '💋';
   if (hl) hl.textContent = 'BACIO';
   updateHUD();
 }
@@ -1440,7 +1444,7 @@ function handleGuruTap() {
       // Solo ora cambia il bottone a documenti
       const emB = document.getElementById('powerupEmoji');
       const hlB = document.getElementById('healLabel');
-      if (emB) emB.textContent = '📄';
+      if (emB) emB.innerHTML = '📄';
       if (hlB) hlB.textContent = 'DOC';
     }
     return;
@@ -2107,7 +2111,7 @@ function startLevel3() {
   initL3Room(0);
   const em = document.getElementById('powerupEmoji');
   const hl = document.getElementById('healLabel');
-  if (em) em.textContent = '🔄';
+  if (em) em.innerHTML = '🔄';
   if (hl) hl.textContent = 'RESET';
   const emL3=document.getElementById('powerupEmojiL3'); if(emL3) emL3.textContent='🔄';
 }
