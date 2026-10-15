@@ -1763,9 +1763,9 @@ function drawL2House3(sx, gy) {
       const bankY2 = gy - 180 + (l2.bankY || 0);
       const bsx = Math.round(l2.house3X + 80 - camera);
       if (imgBank.complete && imgBank.naturalWidth > 0) {
-        const bankW = 160;
+        const bankW = 320;
         const bankH = Math.round(bankW * imgBank.naturalHeight / imgBank.naturalWidth);
-        ctx.drawImage(imgBank, bsx, bankY2 - (bankH - 180), bankW, bankH);
+        ctx.drawImage(imgBank, bsx - 80, bankY2 - (bankH - 180), bankW, bankH);
       } else {
         ctx.fillStyle='#888898'; ctx.fillRect(bsx, bankY2, 160, 180);
         ctx.fillStyle='#ff2200';
