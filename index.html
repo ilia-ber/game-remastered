@@ -78,7 +78,7 @@
       <div class="ctrlBtn" id="btnRight">▶</div>
     </div>
     <div class="btnGroup">
-      <div class="ctrlBtn" id="btnPowerup"><span id="powerupEmoji">📱</span><span id="healLabel">CHIAMA</span></div>
+      <div class="ctrlBtn" id="btnPowerup"><span id="powerupEmoji"><img id="iliaPhoneImg" src="ilia_phone.png" style="width:32px;height:32px;object-fit:contain;vertical-align:middle;" onerror="this.style.display='none';document.getElementById('powerupEmojiText').style.display='inline'"><span id="powerupEmojiText" style="display:none">📱</span></span><span id="healLabel">CHIAMA</span></div>
       <div class="ctrlBtn" id="btnJump">▲</div>
     </div>
   </div>
@@ -144,6 +144,10 @@ bgImg.src = 'bg_level1.png';
 const imgHauntedHouse = new Image(); imgHauntedHouse.src = 'haunted_house.png';
 const imgBgDungeon    = new Image(); imgBgDungeon.src    = 'bg_dungeon.png';
 const imgBgLevel2     = new Image(); imgBgLevel2.src     = 'bg_level2.png';
+const imgCasa         = new Image(); imgCasa.src         = 'casa.png';
+const imgBank         = new Image(); imgBank.src         = 'bank.png';
+const imgIliaAvatar   = new Image(); imgIliaAvatar.src   = 'ilia_avatar.png';
+const imgIliaPhone    = new Image(); imgIliaPhone.src    = 'ilia_phone.png';
 const imgTempio       = new Image(); imgTempio.src       = 'tempio.png';
 const imgGuru         = new Image(); imgGuru.src         = 'guru.png';
 const imgGuruAngry    = new Image(); imgGuruAngry.src    = 'guru_angry.png';
@@ -1631,8 +1635,10 @@ function drawL2House1(sx, gy) {
 }
 
 function drawL2House3(sx, gy) {
-  // Casa bianca luminosa (abbozzata)
   const hw = 260, hh = 200;
+  if (imgCasa.complete && imgCasa.naturalWidth > 0) {
+    ctx.drawImage(imgCasa, sx, gy-hh*1.5, hw*1.5, hh*1.5);
+  } else {
   // Aureola luminosa attorno alla casa
   const grd = ctx.createRadialGradient(sx+hw/2, gy-hh/2, 20, sx+hw/2, gy-hh/2, 180);
   grd.addColorStop(0,'rgba(255,255,240,0.3)'); grd.addColorStop(1,'transparent');
@@ -1683,7 +1689,10 @@ function drawL2House3(sx, gy) {
   if (l2.house3Phase === 'bank' || l2.house3Phase === 'win') {
     const bankY2 = gy - 180 + (l2.bankY || 0);
     const bsx = sx + 80;
-    // Corpo banca (rettangolo grigio istituzionale)
+    // Banca sprite o JS
+    if (imgBank.complete && imgBank.naturalWidth > 0) {
+      ctx.drawImage(imgBank, bsx, bankY2, 160, 180);
+    } else {
     ctx.fillStyle='#888898'; ctx.fillRect(bsx, bankY2, 160, 180);
     ctx.fillStyle='#9999aa'; ctx.fillRect(bsx, bankY2, 160, 20); // tetto
     // Colonne
@@ -1696,6 +1705,7 @@ function drawL2House3(sx, gy) {
     // Occhi cattivi
     ctx.fillStyle='#ff2200';
     ctx.fillRect(bsx+40, bankY2+40, 20, 15); ctx.fillRect(bsx+100, bankY2+40, 20, 15);
+    } // fine else banca JS
     // Barra vita
     if (!l2.bankFlying) {
       ctx.fillStyle='#333'; ctx.fillRect(bsx, bankY2-20, 160, 10);
@@ -2016,11 +2026,42 @@ const L3_FIRST_OBJ = [
 ];
 
 // Scelte per ogni stanza (obj 2 e obj 3)
-const L3_BONUS_CHOICES = [
-  [ {emoji:'🍳',label:'PADELLA'}, {emoji:'🦩',label:'FENICOTTERO'}, {emoji:'🛶',label:'CANOA'} ],
-  [ {emoji:'📚',label:'LIBRERIA'}, {emoji:'🪆',label:'MANUELA\nBATTAGLIA'}, {emoji:'🪣',label:'TAPPETO'} ],
-  [ {emoji:'💡',label:'LAMPADA'}, {emoji:'🎨',label:'TAPPETO\nCOLORATO'}, {emoji:'👩‍💼',label:'MANUELA\nBATTAGLIA'} ],
+// Pool completo oggetti bonus
+const L3_BONUS_POOL = [
+  {emoji:'🍝',label:'SPAGHETTI'},
+  {emoji:'🦩',label:'FENICOTTERO'},
+  {emoji:'🛶',label:'CANOA'},
+  {emoji:'📚',label:'LIBRERIA'},
+  {emoji:'🪆',label:'MANUELA BATTAGLIA'},
+  {emoji:'🥦',label:'BROCCOLO'},
+  {emoji:'🥾',label:'SCARPE'},
+  {emoji:'🎛️',label:'PEDALI'},
+  {emoji:'🧻',label:'CANTACIENA'},
+  {emoji:'🪅',label:'PIGNATTA'},
+  {emoji:'🐘',label:'ELEFANTE'},
+  {emoji:'🎸',label:'CHITARRA'},
+  {emoji:'🎮',label:'CONSOLE'},
+  {emoji:'🖼️',label:'QUADRO'},
+  {emoji:'🪴',label:'ORCHIDEA'},
+  {emoji:'🐈',label:'GATTINO'},
+  {emoji:'👩‍💼',label:'MANUELA BATTAGLIA'},
+  {emoji:'💡',label:'LAMPADA'},
+  {emoji:'📺',label:'TV'},
 ];
+
+// Genera 3 scelte random dal pool senza ripetizioni
+function getRandomBonusChoices() {
+  const pool = [...L3_BONUS_POOL];
+  const choices = [];
+  while (choices.length < 3) {
+    const idx = Math.floor(Math.random() * pool.length);
+    choices.push(pool.splice(idx, 1)[0]);
+  }
+  return choices;
+}
+
+// L3_BONUS_CHOICES non più usato — sostituito da getRandomBonusChoices()
+const L3_BONUS_CHOICES = [];
 
 let l3 = {
   active: false,
@@ -2175,7 +2216,7 @@ function updateLevel3() {
 }
 
 function showL3Choices() {
-  const choices = L3_BONUS_CHOICES[l3.room];
+  const choices = getRandomBonusChoices();
   const ui = document.getElementById('l3choiceUI');
   const btns = document.getElementById('l3choiceBtns');
   if (!ui || !btns) return;
