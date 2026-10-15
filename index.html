@@ -1648,7 +1648,7 @@ function drawL2House3(sx, gy) {
   const hw = 260, hh = 200;
   if (imgCasa.complete && imgCasa.naturalWidth > 0) {
     ctx.drawImage(imgCasa, sx, gy-hh*1.5, hw*1.5, hh*1.5);
-  } else {
+  } else { // fallback JS
   // Aureola luminosa attorno alla casa
   const grd = ctx.createRadialGradient(sx+hw/2, gy-hh/2, 20, sx+hw/2, gy-hh/2, 180);
   grd.addColorStop(0,'rgba(255,255,240,0.3)'); grd.addColorStop(1,'transparent');
@@ -1740,6 +1740,61 @@ function drawL2House3(sx, gy) {
     }
   }
   } // fine else casa JS fallback
+
+  // Dialog e banca sempre sopra (anche con sprite casa)
+  // (già disegnati dentro l'else, ma se c'è lo sprite li ridisegniamo qui)
+  if (imgCasa.complete && imgCasa.naturalWidth > 0) {
+    if (l2.house3Phase === 'dialog') {
+      const dialogs2 = [
+        {who:'CARLO', text:'Vedi anche tu quello\nche vedo io?'},
+        {who:'ILIA',  text:'Certo! Siamo arrivati\nalla nostra casa!'},
+        {who:'CARLO', text:'....ma che cosa??'},
+      ];
+      const dlg2 = dialogs2[l2.house3DialogStep];
+      if (dlg2) {
+        const bx=16,by=62,bw=W-32,bh=110;
+        ctx.fillStyle='rgba(0,0,10,0.92)'; ctx.fillRect(bx,by,bw,bh);
+        ctx.strokeStyle='#ffe066'; ctx.lineWidth=2; ctx.strokeRect(bx,by,bw,bh);
+        ctx.font='8px "Press Start 2P"'; ctx.fillStyle='#ffe066';
+        ctx.fillText(dlg2.who+':', bx+12, by+22);
+        ctx.fillStyle='#fff';
+        dlg2.text.split('\n').forEach((line,i) => ctx.fillText(line, bx+12, by+46+i*24));
+        if (Math.floor(Date.now()/450)%2===0) {
+          ctx.font='6px "Press Start 2P"'; ctx.fillStyle='#888';
+          ctx.textAlign='right'; ctx.fillText('tocca ▶', bx+bw-10, by+bh-10); ctx.textAlign='left';
+        }
+      }
+    }
+    if (l2.house3Phase === 'bank' || l2.house3Phase === 'win') {
+      const bankY2 = gy - 180 + (l2.bankY || 0);
+      const bsx = Math.round(l2.house3X + 80 - camera);
+      if (imgBank.complete && imgBank.naturalWidth > 0) {
+        ctx.drawImage(imgBank, bsx, bankY2, 160, 180);
+      } else {
+        ctx.fillStyle='#888898'; ctx.fillRect(bsx, bankY2, 160, 180);
+        ctx.fillStyle='#ff2200';
+        ctx.fillRect(bsx+40, bankY2+40, 20, 15); ctx.fillRect(bsx+100, bankY2+40, 20, 15);
+        ctx.font='11px "Press Start 2P"'; ctx.fillStyle='#333'; ctx.textAlign='center';
+        ctx.fillText('BANCA', bsx+80, bankY2+100); ctx.textAlign='left';
+      }
+      if (!l2.bankFlying) {
+        ctx.fillStyle='#333'; ctx.fillRect(bsx, bankY2-20, 160, 10);
+        ctx.fillStyle='#ff4444'; ctx.fillRect(bsx, bankY2-20, 160*(1-l2.bankHits/5), 10);
+        ctx.font='6px "Press Start 2P"'; ctx.fillStyle='#fff'; ctx.textAlign='center';
+        ctx.fillText('DOCUMENTI: '+l2.bankHits+'/5', bsx+80, bankY2-24); ctx.textAlign='left';
+        ctx.font='8px "Press Start 2P"'; ctx.fillStyle='#ffe066'; ctx.textAlign='center';
+        if (Math.floor(Date.now()/500)%2===0) ctx.fillText('📄 LANCIA DOCUMENTI!', W/2, 110);
+        ctx.textAlign='left';
+      }
+      l2.docs.forEach(d => {
+        const dsx = Math.round(d.x - camera);
+        ctx.fillStyle='#fff'; ctx.fillRect(dsx-8, Math.round(d.y)-10, 16, 20);
+        ctx.strokeStyle='#aaa'; ctx.lineWidth=1; ctx.strokeRect(dsx-8, Math.round(d.y)-10, 16, 20);
+        ctx.fillStyle='#88aaff';
+        for(let li=0;li<3;li++) ctx.fillRect(dsx-5, Math.round(d.y)-6+li*5, 10, 2);
+      });
+    }
+  }
 }
 
 function drawL2Snake(gy) {
