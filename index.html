@@ -1583,12 +1583,6 @@ function drawL2World(gy) {
   }
   drawCarlo();
 
-  // DEBUG banca
-  if (l2.house3X > 0) {
-    ctx.font='7px "Press Start 2P"'; ctx.fillStyle='#ff0'; ctx.textAlign='left';
-    ctx.fillText('phase:'+l2.house3Phase+' hits:'+l2.bankHits+' px:'+Math.round(player.x)+' h3:'+Math.round(l2.house3X), 10, 120);
-    ctx.fillText('docs:'+l2.docs.length+' flying:'+l2.bankFlying, 10, 135);
-  }
   // Titolo livello
   if (l2.titleTimer > 0) {
     const alpha = Math.min(1, l2.titleTimer/30);
@@ -1769,7 +1763,9 @@ function drawL2House3(sx, gy) {
       const bankY2 = gy - 180 + (l2.bankY || 0);
       const bsx = Math.round(l2.house3X + 80 - camera);
       if (imgBank.complete && imgBank.naturalWidth > 0) {
-        ctx.drawImage(imgBank, bsx, bankY2, 160, 180);
+        const bankW = 160;
+        const bankH = Math.round(bankW * imgBank.naturalHeight / imgBank.naturalWidth);
+        ctx.drawImage(imgBank, bsx, bankY2 - (bankH - 180), bankW, bankH);
       } else {
         ctx.fillStyle='#888898'; ctx.fillRect(bsx, bankY2, 160, 180);
         ctx.fillStyle='#ff2200';
