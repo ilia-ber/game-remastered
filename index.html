@@ -1583,6 +1583,12 @@ function drawL2World(gy) {
   }
   drawCarlo();
 
+  // DEBUG banca
+  if (l2.house3X > 0) {
+    ctx.font='7px "Press Start 2P"'; ctx.fillStyle='#ff0'; ctx.textAlign='left';
+    ctx.fillText('phase:'+l2.house3Phase+' hits:'+l2.bankHits+' px:'+Math.round(player.x)+' h3:'+Math.round(l2.house3X), 10, 120);
+    ctx.fillText('docs:'+l2.docs.length+' flying:'+l2.bankFlying, 10, 135);
+  }
   // Titolo livello
   if (l2.titleTimer > 0) {
     const alpha = Math.min(1, l2.titleTimer/30);
@@ -2252,6 +2258,10 @@ window.addEventListener('keydown', e => {
   if (e.key === '3') {
     document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'));
     startLevel3();
+  }
+  if (e.key === '2') {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden'));
+    level = 2; state = 'playing'; initLevel2();
   }
 });
 window.addEventListener('keyup', e => {
